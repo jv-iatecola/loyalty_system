@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'corsheaders',  
     'django.contrib.staticfiles',
 ]
 
@@ -78,6 +79,7 @@ LOGGING = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -85,7 +87,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'middleware.middleware.JwtMiddleware',
+    'middleware.middleware.JwtMiddleware'
 ]
 
 ROOT_URLCONF = 'server.urls'
@@ -125,17 +127,6 @@ DATABASES = {
             "service": "ls_db_dev",
             "passfile": ".my_pgpass",
         },
-        'TEST': {
-            'MIRROR': 'test_db',
-        }
-    },
-    "test_db": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "test_db",
-        "USER": "postgres",
-        "PASSWORD": "0000",
-        "HOST": "localhost",
-        "PORT": "5432",
     }
 }
 
@@ -185,3 +176,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ORIGIN_ALLOW_ALL = True    

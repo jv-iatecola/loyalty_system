@@ -27,7 +27,7 @@ class TestsVouchersDeleteController(TestCase):
             store_name="Test_Store",
             accounts=mock_user
         )
-        return mock_store
+        return mock_store 
     
     def create_mock_voucher(self, mock_voucher_repository, mock_user, mock_store):
         mock_voucher = mock_voucher_repository.__class__().create(
