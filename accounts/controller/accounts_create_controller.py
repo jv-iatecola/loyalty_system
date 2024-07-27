@@ -57,4 +57,4 @@ def create(request):
 
     logger.info(f"Email sent successfully to '{accounts.email}' at provider/mail_provider.")
 
-    return JsonResponse({"message": jwt_token})
+    return JsonResponse({"message": jwt_token}, status=201)

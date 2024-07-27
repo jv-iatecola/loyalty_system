@@ -106,4 +106,4 @@ class TestsCreateController(TestCase):
         self.assertEqual(response_content.get("email"), self.user.get("email"))
         self.assertEqual(self.user.get("email"), response_content.get("email"))
         self.assertEqual(self.user.get("username"), "create_test_user")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
