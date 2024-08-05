@@ -1,5 +1,6 @@
 from common.utils import logger, make_pagination, make_filter
 from vouchers.models import Vouchers
+from stores.models import Stores
 from datetime import datetime
 from uuid import uuid4
 
@@ -16,9 +17,22 @@ class VoucherRepository:
     @staticmethod
     def get_by_user_id(id):
         found_vouchers = list(Vouchers.objects.filter(accounts_id=id).values())
-        logger.info(f"Found '{len(found_vouchers)}' voucher(s) for the user '{id}' at VoucherRepository/get_by_user_id.")
-        return found_vouchers
-        
+        store_ids = [voucher['stores_id'] for voucher in found_vouchers]
+        found_stores = list(Stores.objects.filter(id__in=store_ids))
+        stores_dict = {store.id: store for store in found_stores}
+        updated_vouchers = []
+
+        for voucher in found_vouchers:
+            store_id = voucher['stores_id']
+            store = stores_dict.get(store_id)
+            if store:
+                updated_voucher = voucher.copy()
+                updated_voucher['store_name'] = store.store_name
+                updated_vouchers.append(updated_voucher)
+
+        logger.info(f"Found '{len(updated_vouchers)}' voucher(s) for the user '{id}' at VoucherRepository/get_by_user_id.")
+        return updated_vouchers
+
     @staticmethod
     def get_by_filters(**kwargs):
         filter_type = {}
@@ -46,7 +60,6 @@ class VoucherRepository:
 
 
         found_vouchers = list(Vouchers.objects.filter(accounts=user_id).filter(**stores_id).filter(**kwargs, **filter_type).values().order_by(order_by))
-
         kwargs.clear()
         
         logger.info(f"Found '{len(found_vouchers)}' voucher(s) at VoucherRepository/get_by_filters.")
