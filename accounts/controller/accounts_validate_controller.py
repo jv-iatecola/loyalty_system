@@ -18,7 +18,6 @@ def validate(request, hashed_data):
         return JsonResponse({"message": "Invalid Request Error"}, status=500)
 
     found_user = AccountsRepository.get_by_id(data_content.get('id'))
-    print("FOUND USER", found_user)
     if not found_user:
         return JsonResponse({"message": f"Invalid User Error: User '{data_content.get('id')}' not found."}, status=400)
 

@@ -44,26 +44,3 @@ class AccountsRepository:
         except Accounts.DoesNotExist:
             logger.info(f"Failed to find a user with the id '{id}' at AccountsRepository/get_by_id.")
             return False
-
-
-    # @staticmethod
-    # def delete(email):
-    #     try:
-    #         Accounts.objects.get(email=email).delete()
-    #         logger.info(f"Deleted user with email '{email}' at AccountsRepository/delete.")
-
-    #     except Accounts.DoesNotExist:
-    #         logger.info(f"Failed to delete user with email '{email}' at AccountsRepository/delete.")
-    #         return False
-
-
-    # @staticmethod
-    # def update_values(*args, **kwargs):
-    #     # for keys, values in kwargs.get("request_response").items():
-    #     #     print("KEYS", keys)
-    #     if "email" in kwargs:
-    #         pass
-    #     if "username" in kwargs:
-    #         pass
-    #     if "password" in kwargs:
-    #         pass

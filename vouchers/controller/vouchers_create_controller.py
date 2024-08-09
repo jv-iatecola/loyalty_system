@@ -18,7 +18,6 @@ def create(request):
         return JsonResponse({"message": "Invalid Fields Error: 'email' is required."}, status=400)
     
     if "store_id" not in request_response:
-    
         found_store = StoresRepository.get_by_user_id(found_user.id)
         if not found_store:
             return JsonResponse({"message": "Invalid Store Error: Store Not Found."}, status=400)
@@ -36,6 +35,5 @@ def create(request):
         accounts=found_requester,
         stores=found_store
     )
-
 
     return JsonResponse({"message": "Voucher generated successfully!"}, status=200)

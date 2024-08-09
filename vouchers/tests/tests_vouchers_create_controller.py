@@ -1,9 +1,9 @@
-import json
 from accounts.repository.accounts_repository import AccountsRepository
 from stores.repository.stores_repository import StoresRepository
 from common.mock.jwt_token_mock import jwt_token
 from django.test import TestCase, Client
 from unittest.mock import patch
+import json
 
 
 @patch("middleware.middleware.AccountsRepository", spec=AccountsRepository)
