@@ -29,7 +29,7 @@ class StoresRepository:
         try:
             found_store = Stores.objects.filter(accounts_id=user_id)[0]
             logger.info(f"Found Store '{found_store.id}' for the user's id '{user_id}' at StoresRepository/get_by_user_id.")
-            return found_store.__dict__
+            return found_store
         
         except Exception as error:
             logger.info(f"Failed to find a Store by the user '{user_id}', error '{error}' at StoresRepository/get_by_user_id.")

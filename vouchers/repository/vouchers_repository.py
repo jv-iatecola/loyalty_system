@@ -69,7 +69,6 @@ class VoucherRepository:
     @staticmethod
     def delete_by_voucher_id(**kwargs):
         voucher_id = kwargs.pop('id')[0]
-
         
         try:
             found_voucher = Vouchers.objects.get(id=voucher_id)
