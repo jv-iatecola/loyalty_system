@@ -4,6 +4,7 @@ from stores.repository.stores_repository import StoresRepository
 from common.mock.jwt_token_mock import jwt_token
 from django.test import TestCase, Client
 from unittest.mock import Mock, patch
+from vouchers.models import Vouchers
 
 @patch("middleware.middleware.AccountsRepository", spec=AccountsRepository)
 class TestsVouchersDeleteController(TestCase):
@@ -36,7 +37,7 @@ class TestsVouchersDeleteController(TestCase):
         )
         return mock_voucher
     
-    def delete_mock_voucher(self, mock_voucher_repository, mock_user_id=None, mock_voucher_id=None):
+    def delete_mock_voucher(self, mock_voucher_repository, mock_user_id=None, mock_voucher_id=None, mock_store_id=None):
         mock_instance = mock_voucher_repository.__class__()
         found_vouchers = None
 
@@ -48,6 +49,10 @@ class TestsVouchersDeleteController(TestCase):
             found_vouchers = mock_instance.delete_by_voucher_id(**{'id':[mock_voucher_id]})
             mock_voucher_repository.delete_by_voucher_id.return_value = found_vouchers
 
+        if mock_store_id:
+            found_vouchers = mock_instance.delete_all_vouchers_by_store_id(**{'store_id':[mock_store_id]})
+            mock_voucher_repository.delete_all_vouchers_by_store_id.return_value = found_vouchers
+
         return found_vouchers
 
 
@@ -56,6 +61,28 @@ class TestsVouchersDeleteController(TestCase):
         self.create_mock_store(mock_user)
 
         response = self.client.delete("/vouchers", QUERY_STRING=f"id={mock_user.id}")
+
+        self.assertEqual(response.json().get("message"), f"Failed to find vouchers for the id '{mock_user.id}'.")
+        self.assertEqual(response.status_code, 400)
+
+    @patch("vouchers.repository.vouchers_repository.Vouchers.objects.filter")
+    def test_return_voucher_not_found_by_store_id(self, mock_vouchers, mock_middleware_repository):
+        mock_vouchers.side_effect = Exception("Error")
+        mock_user = self.create_mock_user(mock_middleware_repository)
+        mock_store = self.create_mock_store(mock_user)
+
+        response = self.client.delete("/vouchers", QUERY_STRING=f"store_id={mock_store.id}")
+
+        self.assertEqual(response.json().get("message"), f"Failed to find vouchers for the store '{mock_store.id}'.")
+        self.assertEqual(response.status_code, 400)
+
+    @patch("vouchers.repository.vouchers_repository.Vouchers.objects.filter")
+    def test_return_voucher_not_found_by_voucher_and_store_id(self, mock_vouchers, mock_middleware_repository):
+        mock_vouchers.side_effect = Exception("Error")
+        mock_user = self.create_mock_user(mock_middleware_repository)
+        mock_store = self.create_mock_store(mock_user)
+
+        response = self.client.delete("/vouchers", QUERY_STRING=f"id={mock_user.id}&store_id={mock_store.id}")
 
         self.assertEqual(response.json().get("message"), f"Failed to find vouchers for the id '{mock_user.id}'.")
         self.assertEqual(response.status_code, 400)
@@ -82,4 +109,28 @@ class TestsVouchersDeleteController(TestCase):
         response = self.client.delete("/vouchers", QUERY_STRING=f"id={mock_voucher.id}")
 
         self.assertEqual(response.json().get("message"), f"Voucher '{mock_voucher.id}' deleted successfully.")
+        self.assertEqual(response.status_code, 200)
+
+    @patch("vouchers.controller.vouchers_delete_controller.VoucherRepository", spec=VoucherRepository)
+    def test_return_delete_by_voucher_and_store_id(self, mock_voucher_repository, mock_middleware_repository):
+        mock_user = self.create_mock_user(mock_middleware_repository)
+        mock_store = self.create_mock_store(mock_user)
+        mock_voucher = self.create_mock_voucher(mock_voucher_repository, mock_user, mock_store)
+        self.delete_mock_voucher(mock_voucher_repository, mock_voucher_id=mock_voucher.id)
+        
+        response = self.client.delete("/vouchers", QUERY_STRING=f"id={mock_voucher.id}&store_id={mock_store.id}")
+
+        self.assertEqual(response.json().get("message"), f"Voucher '{mock_voucher.id}' deleted successfully.")
+        self.assertEqual(response.status_code, 200)
+
+    @patch("vouchers.controller.vouchers_delete_controller.VoucherRepository", spec=VoucherRepository)
+    def test_return_delete_all_by_store_id(self, mock_voucher_repository, mock_middleware_repository):
+        mock_user = self.create_mock_user(mock_middleware_repository)
+        mock_store = self.create_mock_store(mock_user)
+        mock_voucher = self.create_mock_voucher(mock_voucher_repository, mock_user, mock_store)
+        self.delete_mock_voucher(mock_voucher_repository, mock_store_id=mock_store.id)
+        
+        response = self.client.delete("/vouchers", QUERY_STRING=f"store_id={mock_store.id}")
+
+        self.assertEqual(response.json().get("message"), f"Deleted '1' voucher(s) for the store '{mock_store.id}'.")
         self.assertEqual(response.status_code, 200)

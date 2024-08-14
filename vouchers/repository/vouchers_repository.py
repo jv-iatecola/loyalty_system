@@ -4,7 +4,6 @@ from stores.models import Stores
 from datetime import datetime
 from uuid import uuid4
 
-
 class VoucherRepository:
 
     @staticmethod
@@ -73,7 +72,7 @@ class VoucherRepository:
         try:
             found_voucher = Vouchers.objects.get(id=voucher_id)
             found_voucher.delete()
-            logger.info(f"Voucher '{voucher_id}' deleted for the user '{found_voucher.accounts}' at VoucherRepository/delete_by_voucher_id..")
+            logger.info(f"Voucher '{voucher_id}' deleted for the user '{found_voucher.accounts}' at VoucherRepository/delete_by_voucher_id.")
             
             return f"Voucher '{voucher_id}' deleted successfully."
 
@@ -81,6 +80,19 @@ class VoucherRepository:
             logger.info(f"Voucher id '{voucher_id}' not found at VoucherRepository/delete_by_voucher_id.")
             return False
 
+    @staticmethod
+    def delete_all_vouchers_by_store_id(**kwargs):
+        store_id = kwargs.pop('store_id')[0]
+
+        try:
+            found_vouchers = Vouchers.objects.filter(stores=store_id).delete()
+            logger.info(f"Deleted '{found_vouchers[0]}' voucher(s) for the store '{store_id}' at VoucherRepository/delete_all_vouchers_by_store_id.")
+            return f"Deleted '{found_vouchers[0]}' voucher(s) for the store '{store_id}'."
+
+        except Exception as error:
+            logger.info(f"Failed to delete vouchers due to error '{error}' at VoucherRepository/delete_all_vouchers_by_store_id.")
+            return False
+        
     @staticmethod
     def delete_all_vouchers(user_id):
         found_vouchers = Vouchers.objects.filter(accounts=user_id).delete()
