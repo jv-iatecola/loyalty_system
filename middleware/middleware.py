@@ -1,6 +1,6 @@
 from accounts.repository.accounts_repository import AccountsRepository
-from django.http import JsonResponse
 from common.utils import jwt_decoder, logger
+from django.http import JsonResponse
 import jwt
 
 class JwtMiddleware:
@@ -35,11 +35,9 @@ class JwtMiddleware:
                     {"message": f"Invalid User Error: User '{jwt_token.get('email')}' not found."}, 
                     status=400
                 )
-
             if not found_user.email_is_validated and request.path not in special_routes[0]:
                 return JsonResponse({"message": "Invalid Request Error: Account Not Validated."}, status=401)
 
         request.jwt_token = jwt_token
         request.found_user = found_user
-            
         return self.get_response(request)
