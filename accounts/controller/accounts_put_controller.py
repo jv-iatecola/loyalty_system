@@ -23,9 +23,7 @@ def put(request):
             f"Email '{found_user_with_request_email.email}' already taken by user '{found_user_with_request_email.id}' at accounts_put_controller."
         )
         return JsonResponse(
-            {"message": f"Invalid Email Error: Email '{request_response.get('email')}' is not valid."},
-            status=400
-        )
+            {"message": f"Invalid Email Error: Email '{request_response.get('email')}' is not valid."}, status=400)
 
     if "email" in request_response:
         found_user.email = request_response.get("email")
@@ -47,4 +45,4 @@ def put(request):
 
     found_user.save()
 
-    return JsonResponse({"message": "User updated successfully!"})
+    return JsonResponse({"message": "User updated successfully!"}, status=200)
