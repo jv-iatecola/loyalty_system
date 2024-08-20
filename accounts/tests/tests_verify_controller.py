@@ -16,7 +16,7 @@ class TestVerifyController(TestCase):
         mock_user = AccountsRepository.create(
             email="test_user@test.com",
             password="12345",
-            username="Vouchers_Create_Tester",
+            username="Verify_Tester",
             email_is_validated=True
         )
         mock_repository.get_by_email.return_value = mock_user
