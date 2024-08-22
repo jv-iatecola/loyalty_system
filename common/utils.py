@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator
 from django.core.paginator import Paginator
 from datetime import datetime, timedelta
@@ -6,6 +7,8 @@ import logging
 import json
 import uuid
 import jwt
+import re
+
 
 logger = logging.getLogger("default_logger")
 
@@ -55,9 +58,23 @@ def validate_email(email):
     try:
         email_validator(email)
         return email
-    except Exception:
-        logger.info(f"Failed to validate email '{email}' at common/utils/validate_email.")
+    except Exception as error:
+        logger.info(f"Email validation failed: '{error}' at common/utils/validate_email.")
         return False
+
+def validate_username(username):
+    try:
+        if len(username) < 3:
+            raise ValidationError("Username must be at least 3 characters long.")
+        
+        if not re.match(r"^[a-zA-Z0-9_.-]+$", username):
+            raise ValidationError("Username can only contain letters, numbers, and the characters: '_', '.', '-'.")
+
+        return True
+    except ValidationError as error:
+        logger.info(f"Username validation failed: '{error}' at common/utils/validate_email.")
+        return False
+
 
 def jwt_encoder(**kwargs):
     email = kwargs.pop("email")

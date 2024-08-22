@@ -45,7 +45,7 @@ def create(request):
 
     sent_email = send_email(
         {
-            "sendto": accounts.email, 
+            "sendto": "joao.iatecola100@gmail.com", 
             "name": accounts.username, 
             "body": f"Please click on the link below to validate your new Django's Loyalty System Account: \nhttp://localhost:8000/accounts/validate/{hashed_data}."
         }
