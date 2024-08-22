@@ -13,7 +13,7 @@ class AccountsRepository:
             email_is_validated = kwargs.pop("email_is_validated")
             
         except Exception as error:
-            logger.info(f"Failed to retrieve 'email_is_validated' from {kwargs}, error: '{error}', at AccountsRepository/create.")
+            logger.info(f"Failed to retrieve 'email_is_validated', error: '{error}', at AccountsRepository/create.")
             email_is_validated = False
 
         accounts = Accounts(*args, **kwargs, id=str(uuid4()), email_is_validated=email_is_validated)

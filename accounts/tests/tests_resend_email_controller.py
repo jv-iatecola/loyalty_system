@@ -60,7 +60,7 @@ class TestsResendEmailController(TestCase):
 
         response = self.client.get("/accounts/resend_email")
 
-        self.assertEqual(response.json().get("message"), "Account created successfully, but failed to send a validation email.")
+        self.assertEqual(response.json().get("message"), "Failed to send a validation email, try again.")
         self.assertEqual(response.status_code, 500)
 
     @patch("accounts.controller.accounts_resend_email_controller.send_email")

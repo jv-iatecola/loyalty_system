@@ -1,10 +1,11 @@
-from common.utils import json_validator, logger, validate_email, hash_data, jwt_encoder
+from common.utils import json_validator, logger, validate_email, validate_username, hash_data, jwt_encoder
+from django.contrib.auth.password_validation import validate_password
 from ..repository.accounts_repository import AccountsRepository
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.hashers import make_password
 from provider.mail_provider import send_email
 from datetime import datetime, timedelta
 from django.http import JsonResponse
-from django.contrib.auth.hashers import make_password
 
 
 @require_http_methods(["POST"])
@@ -25,31 +26,38 @@ def create(request):
     if found_user:
         return JsonResponse({"message": f"Invalid User Error: User '{request_response.get('email')}' already exists."}, status=400)
 
-    jwt_token = jwt_encoder(email=request_response['email'], iat=datetime.now(), exp=datetime.now() + timedelta(minutes=15))
+    validated_username = validate_username(request_response.get("username"))
+    if not validated_username:
+        return JsonResponse({"message": "Invalid Username Error: Enter a valid username."}, status=400)
 
     try:
+        validate_password(request_response.get("password"), user=found_user)
         password = make_password(request_response.get("password"))
 
     except Exception as error:
-        logger.info(f"Failed to hash password due to error: '{error}' at accounts_create_controller.")
-        return JsonResponse({"message": "Invalid Password Error: Failed due to internal error."}, status=500)
+        logger.info(f"Password validation failed: '{error}' at accounts_create_controller.")
+        return JsonResponse({"message": "Invalid Password Error: Enter a valid password."}, status=400)
+
+    jwt_token = jwt_encoder(email=request_response['email'], iat=datetime.now(), exp=datetime.now() + timedelta(minutes=15))
 
     accounts = AccountsRepository.create(
         email=request_response.get("email"), 
         password=password, 
         username=request_response.get("username")
     )
+
     hashed_data = hash_data(accounts.id)
     if not hashed_data:
         return JsonResponse({"message": "Account created successfully, but failed to send a validation email."}, status=500)
 
-    sent_email = send_email(
-        {
-            "sendto": "joao.iatecola100@gmail.com", 
-            "name": accounts.username, 
-            "body": f"Please click on the link below to validate your new Django's Loyalty System Account: \nhttp://localhost:8000/accounts/validate/{hashed_data}."
-        }
-    )
+    email_content = {
+        "sendto": "joao.iatecola100@gmail.com",
+        "name": accounts.username,
+        "body": f"Please click on the link below to validate your new Django's Loyalty System Account: \n"
+                f"http://localhost:8000/accounts/validate/{hashed_data}."
+    }
+
+    sent_email = send_email(email_content)
 
     if sent_email.get("error"):
         logger.info(f"Failed to send a validation email to '{accounts.email}' at accounts_create_controller.")

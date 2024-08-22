@@ -19,7 +19,6 @@ class TestUtils(TestCase):
         self.assertEqual(response, False)
 
     def test_has_next_page(self):
-        # Test case where there is a next page
         items = list(range(1, 101))
         per_page = 10
         page_number = 1

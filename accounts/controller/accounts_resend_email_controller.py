@@ -23,7 +23,7 @@ def resend_email(request):
         )
     
     email_content = {
-        "sendto": "j.iatecola@gmail.com",
+        "sendto": found_user.email,
         "name": found_user.username,
         "body": f"Please click on the link below to validate your new Django's Loyalty System Account: \n"
                 f"http://localhost:8000/accounts/validate/{hashed_data}."
@@ -32,9 +32,9 @@ def resend_email(request):
     sent_email = send_email(email_content)
     
     if sent_email.get("error"):
-        logger.info(f"Failed to send a validation email to '{found_user.email}' at accounts_create_controller.")
+        logger.info(f"Failed to send a validation email to '{found_user.email}' at accounts_resend_email_controller.")
         return JsonResponse(
-            {"message": "Account created successfully, but failed to send a validation email."},
+            {"message": "Failed to send a validation email, try again."},
             status=500
         )
 

@@ -72,9 +72,3 @@ class TestMiddleware(TestCase):
         response = self.client.get("/vouchers")
 
         self.assertEqual(response.status_code, 200)
-
-
-    # def test_validate_return(self):
-    #     response = self.client.get("/vouchers")
-
-    #     self.assertEqual(response, "soda")

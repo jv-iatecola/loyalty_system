@@ -13,7 +13,7 @@ class TestsCreateController(TestCase):
         
         self.user = {
             "email": "test@gmail.com",
-            "password": "12345",
+            "password": "P4ssw0rd!",
             "username": "create_test_user"
         }
 
@@ -27,6 +27,12 @@ class TestsCreateController(TestCase):
             "email": "testgmail.com",
             "password": "12345",
             "username": "create_test_user"
+        }
+
+        self.invalid_username_user = {
+            "email": "test@gmail.com",
+            "password": "P4ssw0rd!",
+            "username": ""
         }
 
     def create_mock_user(self, mock_repository):
@@ -59,9 +65,18 @@ class TestsCreateController(TestCase):
 
     def test_return_invalid_user_error(self, mock_repository):
         mock_repository.get_by_email.return_value = True
+        
         response = self.client.post("/accounts/create", data=json.dumps(self.user), content_type="application/json")
 
         self.assertEqual(response.json().get("message"), "Invalid User Error: User 'test@gmail.com' already exists.")
+        self.assertEqual(response.status_code, 400)
+
+    def test_return_invalid_username_error(self, mock_repository):
+        mock_repository.get_by_email.return_value = False
+
+        response = self.client.post("/accounts/create", data=json.dumps(self.invalid_username_user), content_type="application/json")
+
+        self.assertEqual(response.json().get("message"), "Invalid Username Error: Enter a valid username.")
         self.assertEqual(response.status_code, 400)
 
     @patch("accounts.controller.accounts_create_controller.make_password")
@@ -71,8 +86,8 @@ class TestsCreateController(TestCase):
 
         response = self.client.post("/accounts/create", data=json.dumps(self.user), content_type="application/json")
 
-        self.assertEqual(response.json().get("message"), "Invalid Password Error: Failed due to internal error.")
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json().get("message"), "Invalid Password Error: Enter a valid password.")
+        self.assertEqual(response.status_code, 400)
 
     @patch("accounts.controller.accounts_create_controller.hash_data")
     def test_return_failed_to_hash_data(self, mock_hash_data, mock_repository):
@@ -89,6 +104,7 @@ class TestsCreateController(TestCase):
         self.create_mock_user(mock_repository)
         mock_send_email.return_value = {"error": True}
         mock_repository.get_by_email.return_value = False
+
         response = self.client.post("/accounts/create", data=json.dumps(self.user), content_type="application/json")
 
         self.assertEqual(response.json().get("message"), "Account created successfully, but failed to send a validation email.")
