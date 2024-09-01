@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-k3aqfr(hep1jhnt4__j%y89u_n**o2u7r6c192s)5j6h^060d%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['loyalty-system.onrender.com']
 
 EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
 EMAIL_HOST_USER = '5a83de8bab5723'
