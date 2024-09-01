@@ -56,7 +56,7 @@ class TestsResendEmailController(TestCase):
     @patch("accounts.controller.accounts_resend_email_controller.send_email")
     def test_return_failed_to_send_validation_email(self, mock_send_email, mock_middleware_repository):
         self.create_mock_user(mock_middleware_repository, **self.user)
-        mock_send_email.return_value = {"error": True}
+        mock_send_email.return_value = False
 
         response = self.client.get("/accounts/resend_email")
 

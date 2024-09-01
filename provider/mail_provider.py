@@ -1,19 +1,25 @@
-import requests
-
+from email.mime.text import MIMEText
+from common.utils import logger
+import smtplib
+import os
 
 def send_email(user_data):
-    url = "https://rapidmail.p.rapidapi.com/"
-    # url = "https://jsonplaceholder.typicode.com/posts"
-    payload = {
-        "ishtml": "false",
-        "replyto": "",
-        "title": "Validate your Account!",
-        **user_data
-    }
-    headers = {
-        "x-rapidapi-key": "14d61413bbmsh2ec4e9c564c55fbp16950ejsn883b19105278",
-        "x-rapidapi-host": "rapidmail.p.rapidapi.com",
-        "Content-Type": "application/json"
-    }
+    try:
+        subject = f"Welcome! {user_data.pop('name')}"
+        body = user_data.pop('body')
+        sender = os.getenv("SENDER_EMAIL")
+        recipients = [user_data.pop('send_to')]
+        password = os.getenv("EMAIL_PASSWORD")
 
-    return requests.post(url, json=payload, headers=headers).json()
+        msg = MIMEText(body)
+        msg['Subject'] = subject
+        msg['From'] = sender
+        msg['To'] = ', '.join(recipients)
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+            smtp_server.login(sender, password)
+            smtp_server.sendmail(sender, recipients, msg.as_string())
+        return True
+
+    except Exception as error:
+        logger.info(f"Failed to send a validation email, error '{error}' at provider/mail_provider.")
+        return False

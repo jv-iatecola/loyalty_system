@@ -5,14 +5,14 @@ from django.test import TestCase
 
 class TestMailProvider(TestCase):
 
-    @patch("provider.mail_provider.requests.post")
-    def test_mail_provider(self, mock_post):
+    @patch("provider.mail_provider.smtplib")
+    def test_mail_sent_successfully(self, mock_smtplib):
         mock_response = Mock()
-        mock_response.json.return_value = {"status": "success"}
-        mock_post.return_value = mock_response
+        mock_smtplib.login = mock_response
+        mock_smtplib.send_email.return_value = mock_response
 
         result = send_email({
-            "sendto": "test_provider@test.com",
+            "send_to": "test_provider@test.com",
             "name": "provider_tester",
             "body": (
                 "Please click on the link below to validate your new "
@@ -21,4 +21,18 @@ class TestMailProvider(TestCase):
             )
         })
 
-        self.assertEqual(result.get("status"), "success")
+        self.assertEqual(result, True)
+
+    @patch("provider.mail_provider.smtplib.SMTP_SSL", side_effect=Exception())
+    def test_failed_to_send_mail(self, mock_smtplib):
+        result = send_email({
+            "send_to": "test_provider@test.com",
+            "name": "provider_tester",
+            "body": (
+                "Please click on the link below to validate your new "
+                "Django's Loyalty System Account: \n"
+                "http://localhost:8000/accounts/validate/hashed_data."
+            )
+        })
+
+        self.assertEqual(result, False)

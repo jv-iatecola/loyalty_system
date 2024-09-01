@@ -26,8 +26,7 @@ def validate(request, hashed_data):
 
 
     exp_soda = data_content.get('exp')
-    print("EXP", exp_soda, type(exp_soda))
-    print("NOW", str(datetime.now().time()), type(str(datetime.now().time())))
+
     if str(datetime.now().time()) > exp_soda:
         logger.info(f"Failed to validate user '{data_content.get('id')}' datetime.now param: '{str(datetime.now().time())}', exp param: '{data_content.get('exp')}' at accounts_validate_controller.")
         return JsonResponse({"message": f"Invalid Date Parameter Error: Date '{data_content.get('exp')}' has expired."}, status=400)

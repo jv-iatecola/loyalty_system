@@ -50,17 +50,14 @@ def create(request):
     if not hashed_data:
         return JsonResponse({"message": "Account created successfully, but failed to send a validation email."}, status=500)
 
-    email_content = {
-        "sendto": accounts.email,
+    sent_email = send_email({
+        "send_to": "joao.iatecola100@gmail.com",
         "name": accounts.username,
         "body": f"Please click on the link below to validate your new Django's Loyalty System Account: \n"
                 f"http://localhost:8000/accounts/validate/{hashed_data}."
-    }
-
-    sent_email = send_email(email_content)
-
-    if sent_email.get("error"):
-        logger.info(f"Failed to send a validation email to '{accounts.email}' at accounts_create_controller.")
+    })
+    
+    if not sent_email:
         return JsonResponse({"message": "Account created successfully, but failed to send a validation email."}, status=500)
 
     logger.info(f"Email sent successfully to '{accounts.email}' at provider/mail_provider.")

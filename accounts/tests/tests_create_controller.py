@@ -102,7 +102,7 @@ class TestsCreateController(TestCase):
     @patch("accounts.controller.accounts_create_controller.send_email")
     def test_return_failed_to_send_validation_email(self, mock_send_email, mock_repository):
         self.create_mock_user(mock_repository)
-        mock_send_email.return_value = {"error": True}
+        mock_send_email.return_value = False
         mock_repository.get_by_email.return_value = False
 
         response = self.client.post("/accounts/create", data=json.dumps(self.user), content_type="application/json")
