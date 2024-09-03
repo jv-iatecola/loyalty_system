@@ -26,7 +26,7 @@ def resend_email(request):
         "send_to": found_user.email,
         "name": found_user.username,
         "body": f"Please click on the link below to validate your new Django's Loyalty System Account: \n"
-                f"http://localhost:8000/accounts/validate/{hashed_data}."
+                f"https://loyalty-system.onrender.com/accounts/validate/{hashed_data}."
     })
 
     if not sent_email:

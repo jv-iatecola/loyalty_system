@@ -51,10 +51,10 @@ def create(request):
         return JsonResponse({"message": "Account created successfully, but failed to send a validation email."}, status=500)
 
     sent_email = send_email({
-        "send_to": "joao.iatecola100@gmail.com",
+        "send_to": accounts.email,
         "name": accounts.username,
         "body": f"Please click on the link below to validate your new Django's Loyalty System Account: \n"
-                f"http://localhost:8000/accounts/validate/{hashed_data}."
+                f"https://loyalty-system.onrender.com/accounts/validate/{hashed_data}."
     })
     
     if not sent_email:
